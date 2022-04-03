@@ -1,27 +1,4 @@
-#+begin_src emacs-lisp
 
-  ;;; jv-basic-edit.el --- Some basic text editing commands  -*- lexical-binding:t; -*-
-
-
-  ;; Author: Janne Väisänen <janva415@gmail.com>
-  ;; Created 26 Mar 2022
-  ;; Version: 0.1
-
-  ;; Keywords: elisp, textediting
-  ;; URL:
-
-  ;;; Commentary
-
-  ;; This package provides the minor mode jv-basic-edit. It's a minimal package ;; consisting of a feew basic text editing commands such as copy whole line.  ;; This file is not part of GNU Emacs. This was part of me learning Elisp and how minor mode are built. Feel free to copy but be aware the code herein has its flaws and there are probably better solutions out there.
-
-  ;; This file is free sofware...
-
-  ;;;###autoload
-
-  #+end_src
-
-;;; Code:
-  
 ** Creating   a minor mode
 Turning your code/package into a minor mode  could  be done using  the =define-minor-mode= mode macro. But to get a better understanding  of how minor modes work and are setup I decided to do it manually. To do so you need a bit of boilerplate code  following a few conventions (hence the macro).
 We need
@@ -180,10 +157,67 @@ Minor modes can be global or associtiated with specific buffer.  In case you wan
   )))
 #+end_src
 
-#+begin_src emacs-lisp
-(provide 'jv-basic-edit)
-#+end_src>
+** Turning your code into package
+
+Following code can be found at the top the file containing the minor mode. It turn the file into a simple package. You can read more about
+[[https://www.gnu.org/software/emacs/manual/html_node/elisp/Packaging-Basics.html][creating simple packages]] in the Emacs manual.  =;;;=
+is used to subdivide content of package. I think they use the term stylized comments for this. You can read about the the different headers etc [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Library-Headers.html][here.]]
+
 
 #+begin_src emacs-lisp
-;;; jv-basic-edit.el ends here
+
+    ;;; jv-basic-edit.el --- Some basic text editing commands  -*- lexical-binding:t; -*-
+
+
+    ;; Author: Janne Väisänen <janva415@gmail.com>
+    ;; Created 26 Mar 2022
+    ;; Version: 0.1
+
+    ;; Keywords: elisp, textediting
+    ;; URL:
+
+    ;;; Commentary
+
+    ;; This package provides the minor mode jv-basic-edit. It's a minimal package ;; consisting of a feew basic text editing commands such as copy whole line.  ;; This file is not part of GNU Emacs. This was part of me learning Elisp and how minor mode are built. Feel free to copy but be aware the code herein has its flaws and there are probably better solutions out there.
+
+    ;; This file is free sofware...
+
+    ;;;###autoload
+
+
+
+  ;;; Code:
+
+ (message "Package code goes here")
+
+  
+  ;;; jv-basic-edit.el ends here
+#+end_src  
+
+  Note your actuall package code should go in between  =;;;Code=  and 
+ =jv-basic-edit.el ends here= where jv-basic-edit.el should be name of your package file.
+ 
+#+begin_src emacs-lisp
+(provide 'jv-basic-edit)
 #+end_src
+
+** Manually installing your package
+In the future I might be using the [[https://github.com/raxod502/straight.el][straight package]]. This will enable to fetch and install the package from my github using usepackage package. In the meanwhile package installation will be done manually on my local system.  This can be done as follows.
+
+#+begin_src emacs-lisp
+  M-x package-install-file
+#+end_src
+
+This will prompt you for a file to install. The file has to be package see above to learn how to turn your code into package.
+
+** Initilizing package in your init file
+
+I currently use [[https://github.com/jwiegley/use-package][usepackage]] for my init files as it simplifies life. So following lines will load the package and start the mode  when i run my emacs.
+
+#+begin_src emacs-lisp
+  (use-package jv-basic-edit
+    :ensure nil
+    :config (jv-basic-edit-mode 1))
+#+end_src
+
+I use =:ensure nil= here to make sure it doesn't try download it from any repositories as I currently only install it manuall y on my local system.
