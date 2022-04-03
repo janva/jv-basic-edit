@@ -1,5 +1,10 @@
 
-** Creating   a minor mode
+* An experiment on Emacs minor modes
+Decided to learn how minor modes in emacs works and how they are created. Following is the result of this  experiment.
+
+* What is a minor mode?
+
+* Creating   a minor mode
 Turning your code/package into a minor mode  could  be done using  the =define-minor-mode= mode macro. But to get a better understanding  of how minor modes work and are setup I decided to do it manually. To do so you need a bit of boilerplate code  following a few conventions (hence the macro).
 We need
 
@@ -157,7 +162,7 @@ Minor modes can be global or associtiated with specific buffer.  In case you wan
   )))
 #+end_src
 
-** Turning your code into package
+* Turning your code into package
 
 Following code can be found at the top the file containing the minor mode. It turn the file into a simple package. You can read more about
 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Packaging-Basics.html][creating simple packages]] in the Emacs manual.  =;;;=
