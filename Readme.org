@@ -26,9 +26,18 @@ Minor modes can be global or associtiated with specific buffer.  In case you wan
 ;; )
 #+end_src
 
+=defvar= is Elisp special form. Special form means that the expression is evaluated in an out  of the ordninary way. That is it's not evaluated as "normal" expression but using different rules than those applied normally. consider ( + 2  3)  this is just combination consisting of symbols +, 2 and 3. Such expressions follow the rule to first evaluating subsexpressions (2 and 3) and apply the procedure (value of left most symbol) to the arguments which in this case are the evaluated to numbers 2 and 3. =defvar=  on the other hand user special rules for evaluating the expression. In above cas =jv-basic-edit-mode=  is a symbol for variable and is not  evaluated. Insted third thing in combination =nil= is evalueted and bound to the variable and last string is consider to be documentation string which is bound to symbols variable-documentaion string. =nil=  is just the empty list and is used to signify that variable has no value at the moment. =nil=  is also used to mean false sometimes. ugh  this explanation is a bit convulated rewrite...
+
+Anyway you can just think of defvar as way to define a variable  with attached documenations string. 
+
+Next we define the variable for to hold mode specific keybindings. 
 #+begin_src emacs-lisp
 (defvar jv-basic-edit-mode-map (make-sparse-keymap) "The keymap for jv-edit-basic-mode")
 #+end_src
+
+=Keymap= is special internal data structure in ELisp which can be used for binding commands to input events and are used for keylookup. Modes can use keymaps to associated mode specific keys to actions.   Keymaps can contain different kinds of elements one such element is  a char-table. A keymap containing a char-table is called a full keymap. char-tables is an space effective way of recording lots of keybindings. The element whos index is d would be the binding for d.  A =sparse-keymap=  does not contain  char-table and is usually what you need and would use.  There is a lot more to know about keybinding and keymaps if you want learn more see
+[[https://www.gnu.org/software/emacs/manual/html_node/elisp/Keymap-Basics.html][keymap basics]] and [[https://www.masteringemacs.org/article/mastering-key-bindings-emacs][masetring key bindings]]. 
+
 
 ;; Hooks on attached to this list will be run whenever mode is activated/deactivated
 #+begin_src emacs-lisp
