@@ -2,7 +2,8 @@
 * An experiment on Emacs minor modes
 Decided to learn how minor modes in emacs works and how they are created. Following is the result of this  experiment.
 
-* What is a minor mode?
+* What is a mode?
+Modes (editing modes) in emacs are used to alters how emacs behaves in some useful ways.Modes are categorized as being either major or minor. Major mode provides means for working with particular file type (.org, .c .pdf etc) or buffers of none-file type (shell etc). Each buffer allways uses a single major mode at any time. Minor modes are independent modes that associates some additional behaviour  to file or buffer type. By independt we mean that they are not dependent on other modes neither major or minor ones and as such can be used independently of other modes. Minor modes can be turned on and off as we you wish you can have any number of minor modes in use for each buffer. Minor modes  can be either buffer-local or global. Global modes when in use are active in all your buffers wheras buffer local modes are only active for the buffers you you have specifically activated the mode for.Examples of minor modes are show-paren-mode, display-line-number-mode and cwarn-mode.
 
 * Creating   a minor mode
 Turning your code/package into a minor mode  could  be done using  the =define-minor-mode= mode macro. But to get a better understanding  of how minor modes work and are setup I decided to do it manually. To do so you need a bit of boilerplate code  following a few conventions (hence the macro).
