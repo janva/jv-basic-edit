@@ -9,14 +9,14 @@ Modes (editing modes) in emacs are used to alters how emacs behaves in some usef
 Turning your code/package into a minor mode  could  be done using  the =define-minor-mode= mode macro. But to get a better understanding  of how minor modes work and are setup I decided to do it manually. To do so you need a bit of boilerplate code  following a few conventions (hence the macro).
 We need
 
-- a variable naming the mode ending with =-mode=
-- a function with same name as variable (ELisp has different namespaces for functions and variables)
+- A variable naming the mode ending with =-mode=
+- A function with same name as variable (ELisp has different namespaces for functions and variables)
 
   That's really are all that is needed to create minor mode but in addition we can also   
    
 - Enable keymaps by adding entries in =minor-mode-map-alist=. Entries in the list are  pairs of minor-mode symbols and keymaps.
 - Enable hooks by creating  variable  with following convention =modename-mode-hook=.  This could initially be set to nil. running the hooks can be done using =run-hooks=
- - enable lighter for minor-mode-alist again using minor mode variable symbol and
+ - Enable lighter for minor-mode-alist again using minor mode variable symbol and
 
 Minor modes can be global or associtiated with specific buffer.  In case you want to to be associated with local buffer we need to make the minor-mode variable buffer local. This could be done using the =make-variable-buffer-local= command. I've comment out that part in the below code as i wanted this minor-mode to be global.  I left the comment so you can se how you could define the mode variable and make it buffer local in one shot.
 
