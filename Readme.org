@@ -26,9 +26,9 @@ Minor modes can be global or associtiated with specific buffer.  In case you wan
 ;; )
 #+end_src
 
-=defvar= is Elisp special form. Special form means that the expression is evaluated in an out  of the ordninary way. That is it's not evaluated as "normal" expression but using different rules than those applied normally. consider ( + 2  3)  this is just combination consisting of symbols +, 2 and 3. Such expressions follow the rule to first evaluating subsexpressions (2 and 3) and apply the procedure (value of left most symbol) to the arguments which in this case are the evaluated to numbers 2 and 3. =defvar=  on the other hand user special rules for evaluating the expression. In above cas =jv-basic-edit-mode=  is a symbol for variable and is not  evaluated. Insted third thing in combination =nil= is evalueted and bound to the variable and last string is consider to be documentation string which is bound to symbols variable-documentaion string. =nil=  is just the empty list and is used to signify that variable has no value at the moment. =nil=  is also used to mean false sometimes. ugh  this explanation is a bit convulated rewrite...
+=defvar= is Elisp special form. Special form means that the expression is evaluated in an out  of the ordninary way. That is it's not evaluated as "normal" expression but using different rules than those applied normally. consider ( + 2  3)  this is just combination consisting of symbols +, 2 and 3. Such expressions follow the rule to first evaluating subsexpressions (2 and 3) and apply the procedure (value of left most symbol) to the arguments which in this case are the evaluated to numbers 2 and 3. =defvar=  on the other hand user special rules for evaluating the expression. In above cas =jv-basic-edit-mode=  is a symbol for variable and is not  evaluated. Insted third thing in combination =nil= is evalueted and bound to the variable and last string is consider to be documentation string which is bound to symbols variable-documentaion string. =nil=  is just the empty list and is used to signify that variable has no value at the moment. =nil=  is also used to mean false sometimes. In this case we use it to signal that mode  currently isn't activated. ugh  this explanation is a bit convulated rewrite...
 
-Anyway you can just think of defvar as way to define a variable  with attached documenations string. 
+Anyway you can just think of defvar as a way to define a variable  with attached documenations string. 
 
 Next we define the variable for to hold mode specific keybindings. 
 #+begin_src emacs-lisp
@@ -39,11 +39,16 @@ Next we define the variable for to hold mode specific keybindings.
 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Keymap-Basics.html][keymap basics]] and [[https://www.masteringemacs.org/article/mastering-key-bindings-emacs][masetring key bindings]]. 
 
 
-;; Hooks on attached to this list will be run whenever mode is activated/deactivated
+
+
+When I think of hook I think of template method pattern. Emacs Hooks are variables holding list of functions to be called at some well defined point of execution. For instance a hook function could  be called after a mode has loaded some other just before. We often use hooks to as way to customize behavior of modes. Most modes have at least on hook that executes its list of function as last step mode initialization.
+The hook below will run on activation and deactivation of mode.
+
 #+begin_src emacs-lisp
 (defvar jv-basic-edit-mode-hook nil "The hook for jv-basic-edit-mode")
 #+end_src
 
+Following code adds some keybinding. Normally it's considered good form to use some prefix keybinding as not to bluntly ovewrite other keybindings. In this case i feel using prefixes would anoy me to much. The  =jv-basic-edit-mode-map= variable was defined above. We simply use define-key to populate the variable and  associate the keybinding to this mode by adding an entry =minor-mode-map-alist=. The entry just cons pair of our mode symbol =jv-basic-edit-mode=  and the mode map list we just populated.
 
 #+begin_src emacs-lisp
 (define-key jv-basic-edit-mode-map (kbd "C-<return>") 'open-newline)
@@ -54,13 +59,15 @@ Next we define the variable for to hold mode specific keybindings.
 
 ;;register keybingings map (associate with this mode) 
 (add-to-list 'minor-mode-map-alist ( cons 'jv-basic-edit-mode jv-basic-edit-mode-map))
-
 #+end_src
 
+We to register our minor mode by adding a list consisting  of the minor-mode symbol (=jv-basic-edit-mode=) and a string that can be used in the mode-line  into =minor-mode-alist=.   
 #+begin_src emacs-lisp
 ;;register minor mode
 (add-to-list 'minor-mode-alist '(jv-basic-edit-mode " jv-basic-edit"))
 #+end_src
+
+Finally we define the function to initilize the mode it self. This is an interactive function taking an optional argument which will default to 'toggle if no argument is passed to it.  CONTINUE HERE.......
 
 #+begin_src emacs-lisp
 (defun jv-basic-edit-mode (&optional ARG)
