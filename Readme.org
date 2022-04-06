@@ -97,6 +97,9 @@ Finally we define the function to initilize the mode it self. This is an interac
 #+end_src 
 
 * The commands
+
+I will present the commands code here for convienience so that I don't have to dig into or clone the repository if i want to look something up in future. This code has its flaws but the excersice focused on creating a minor mode so I might not correct the issues in code below.  Neither am I going to explain to much of the code in this section. 
+
 #+begin_src emacs-lisp
 (defun open-newline (&optional n)
   "Opens a new line below current line even if cursor is in middle of current line.Move point to opened line. If N is set open n lines."
@@ -129,8 +132,7 @@ Finally we define the function to initilize the mode it self. This is an interac
     (when (eq direction 1)
       (next-line)))
 
-  ;;Fixme only works once for selected region since loosing the marked area when doing next line
-  (defun duplicate-line-down  ()
+    (defun duplicate-line-down  ()
     "Creates newline(s) containing content of current line(s) below the current line. "
     (interactive)
     (duplicate--line 1))
@@ -141,13 +143,6 @@ Finally we define the function to initilize the mode it self. This is an interac
     (duplicate--line))
 #+end_src
 
-;; could cause problems on last line of buffer
-;; could take advantage of exchange-point and mark?
-;; beg and end delimits  single line at this point it might be first
-;; (if point < mark) or last if (point > mark)
-;; If point is after mark then end is correct but beg is beginnging of last line
-;; mark is looking at characther on first line
-;; if mark is after point end is currently last of first line and mark is at last line
 #+begin_src emacs-lisp
 (defun jv/kill--lines ()
   "Kill whole line(s). If mark is set kill all (whole)lines within region else kill line wher point is. "
@@ -161,8 +156,10 @@ Finally we define the function to initilize the mode it self. This is an interac
   )
 #+end_src
 
-;;Similar to finally clause. If next-line tries to go beyon end of buffer
-  ;; We still want to yank back the killed line. 
+If mark is set we want kill the all lines within the whole region. We start by assigning beg and end to beging resp end of the line where point is at the moment. This set beg and end to beginning and end of the current line that point is looking at.  At this point we don't know wheter point is at last line or first line of the region. If point is greater then mark then mark  is located on first line of region but it might we don't know where on that line. To get the first position of first line we simply move point to mark using =(=goto-char(mark))=. Point is now on first line and we can get first position of that line as well as the whole region using =line-beginning-position=. The =save-excursion= will temporilly store the point end we reach end save-excursion block it will reset the point. If point is less than mark then mark is on last line of region. In similar fashion as above we instead need to find last-position of last line to cover all lines in the region. We need to add 1 to the =line-end-position=
+ to include return/newline  at the end of line as =line-end-position=
+considers it not being part of the line actual line.
+
 #+begin_src emacs-lisp
 ;; FIXME region is lost when command is executed through keybindings. Hence can do it repeatadly
 ;; FIXME should barf on readonly buffers
@@ -178,6 +175,8 @@ Finally we define the function to initilize the mode it self. This is an interac
       (save-mark-and-excursion(yank)))))
 #+end_src
 
+=unwind-protect=  is similar to finally clause. If next-line tries to go beyond end of buffer we still want to yank back the killed line to preserve consistent state else that line will disipear (even thou will still be in kill-ring).
+ 
 #+begin_src emacs-lisp
 (defun swapline-up ()
   "Transpose line(s) up."
@@ -219,13 +218,9 @@ is used to subdivide content of package. I think they use the term stylized comm
 
     ;;;###autoload
 
-
-
   ;;; Code:
-
  (message "Package code goes here")
 
-  
   ;;; jv-basic-edit.el ends here
 #+end_src  
 
