@@ -20,6 +20,10 @@ We need
 
 Minor modes can be global or associtiated with specific buffer.  In case you want to to be associated with local buffer we need to make the minor-mode variable buffer local. This could be done using the =make-variable-buffer-local= command. I've comment out that part in the below code as i wanted this minor-mode to be global.  I left the comment so you can se how you could define the mode variable and make it buffer local in one shot.
 
+** Defining the mode variable
+
+ We start by defining the mode variable
+
 #+begin_src emacs-lisp
 ;; (make-variable-buffer-local
 (defvar jv-basic-edit-mode nil "Toggle jv-edit-basic-mode")
@@ -30,6 +34,8 @@ Minor modes can be global or associtiated with specific buffer.  In case you wan
 
 Anyway you can just think of defvar as a way to define a variable  with attached documenations string. 
 
+** Defining  variable for mode specific keybindings
+
 Next we define the variable for to hold mode specific keybindings. 
 #+begin_src emacs-lisp
 (defvar jv-basic-edit-mode-map (make-sparse-keymap) "The keymap for jv-edit-basic-mode")
@@ -38,15 +44,18 @@ Next we define the variable for to hold mode specific keybindings.
 =Keymap= is special internal data structure in ELisp which can be used for binding commands to input events and are used for keylookup. Modes can use keymaps to associated mode specific keys to actions.   Keymaps can contain different kinds of elements one such element is  a char-table. A keymap containing a char-table is called a full keymap. char-tables is an space effective way of recording lots of keybindings. The element whos index is d would be the binding for d.  A =sparse-keymap=  does not contain  char-table and is usually what you need and would use.  There is a lot more to know about keybinding and keymaps if you want learn more see
 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Keymap-Basics.html][keymap basics]] and [[https://www.masteringemacs.org/article/mastering-key-bindings-emacs][masetring key bindings]]. 
 
+** Defining a variable for hooks
 
-
-
-When I think of hook I think of template method pattern. Emacs Hooks are variables holding list of functions to be called at some well defined point of execution. For instance a hook function could  be called after a mode has loaded some other just before. We often use hooks to as way to customize behavior of modes. Most modes have at least on hook that executes its list of function as last step mode initialization.
+When I think of a hook I think of template method pattern. Emacs Hooks are variables holding list of functions to be called at some well defined point of execution. For instance a hook function could  be called after a mode has loaded some other just before. We often use hooks to as way to customize behavior of modes. Most modes have at least on hook that executes its list of function as last step mode initialization.
 The hook below will run on activation and deactivation of mode.
 
 #+begin_src emacs-lisp
 (defvar jv-basic-edit-mode-hook nil "The hook for jv-basic-edit-mode")
 #+end_src
+
+ Currently I'm not using this hook but if me or someone would like to alter the behavior of this mode it readilly available.
+
+** Adding keybindings
 
 Following code adds some keybinding. Normally it's considered good form to use some prefix keybinding as not to bluntly ovewrite other keybindings. In this case i feel using prefixes would anoy me to much. The  =jv-basic-edit-mode-map= variable was defined above. We simply use define-key to populate the variable and  associate the keybinding to this mode by adding an entry =minor-mode-map-alist=. The entry just cons pair of our mode symbol =jv-basic-edit-mode=  and the mode map list we just populated.
 
@@ -61,29 +70,33 @@ Following code adds some keybinding. Normally it's considered good form to use s
 (add-to-list 'minor-mode-map-alist ( cons 'jv-basic-edit-mode jv-basic-edit-mode-map))
 #+end_src
 
+** Registering the mode
+
 We to register our minor mode by adding a list consisting  of the minor-mode symbol (=jv-basic-edit-mode=) and a string that can be used in the mode-line  into =minor-mode-alist=.   
 #+begin_src emacs-lisp
 ;;register minor mode
 (add-to-list 'minor-mode-alist '(jv-basic-edit-mode " jv-basic-edit"))
 #+end_src
 
-Finally we define the function to initilize the mode it self. This is an interactive function taking an optional argument which will default to 'toggle if no argument is passed to it.  CONTINUE HERE.......
+** The function that initializes the mode
+
+Finally we define the function to initilize the mode it self. This is an interactive function taking an optional argument which will default to 'toggle if no argument is passed to it. There's not much to this function. It simply toggles the variable =jv-basic-edit-mode= if it's called without any argument. If the function is called with an argument the variable will be set to =t=  if the argument is greater than 0 else it will be set to =nil=. So the function basically set the variable we defined earlier to signal to emacs wheter the mode is activated or not. We  log a message to user in minibuffer about the current state of the mode and finally run all registered hook functions by issuing the command =run-hooks= with the mode hook variable symbol ='jv-basic-edit-mode-hook= as  an argument. 
 
 #+begin_src emacs-lisp
-(defun jv-basic-edit-mode (&optional ARG)
-  "jv-basic-edit-mode is a minor mode consisting of a few basic editing commands. If ARG positive number > 0  activate mode else deactivate.If ARG is 'toggle then toggle mode"
-  (interactive (list 'toggle))
-  (setq jv-basic-edit-mode
-	(if (eq ARG 'toggle)
-	    (not jv-basic-edit-mode)
-	  (> ARG 0)))
-  (if jv-basic-edit-mode
-      (message "jv-basic-mode activated")
-    (message "jv-basic-mode deactivated"))
-  (run-hooks 'jv-basic-edit-mode-hook))
+  (defun jv-basic-edit-mode (&optional ARG)
+    "jv-basic-edit-mode is a minor mode consisting of a few basic editing commands. If ARG positive number > 0  activate mode else deactivate.If ARG is 'toggle then toggle mode"
+    (interactive (list 'toggle))
+    (setq jv-basic-edit-mode
+          (if (eq ARG 'toggle)
+              (not jv-basic-edit-mode)
+            (> ARG 0))
+          (if jv-basic-edit-mode
+        (message "jv-basic-mode activated")
+      (message "jv-basic-mode deactivated"))
+    (run-hooks 'jv-basic-edit-mode-hook))
 #+end_src 
 
-** The commands
+* The commands
 #+begin_src emacs-lisp
 (defun open-newline (&optional n)
   "Opens a new line below current line even if cursor is in middle of current line.Move point to opened line. If N is set open n lines."
