@@ -1,9 +1,10 @@
 
-* An experiment on Emacs minor modes
-Decided to learn how minor modes in emacs works and how they are created. Following is the result of this  experiment.
+* Creating your minor mode (a learning experience)
+Decided to learn how minor modes in Emacs works and how they are created. The mode consists of a few simple editing commands such as move line down etc. The actual commands does have some known issues. It might be that i won't be fixing them as this is simply an exercise in minor modes. Feel free to use or copy code at own risk. 
 
 * What is a mode?
-Modes (editing modes) in emacs are used to alters how emacs behaves in some useful ways.Modes are categorized as being either major or minor. Major mode provides means for working with particular file type (.org, .c .pdf etc) or buffers of none-file type (shell etc). Each buffer allways uses a single major mode at any time. Minor modes are independent modes that associates some additional behaviour  to file or buffer type. By independt we mean that they are not dependent on other modes neither major or minor ones and as such can be used independently of other modes. Minor modes can be turned on and off as we you wish you can have any number of minor modes in use for each buffer. Minor modes  can be either buffer-local or global. Global modes when in use are active in all your buffers wheras buffer local modes are only active for the buffers you you have specifically activated the mode for.Examples of minor modes are show-paren-mode, display-line-number-mode and cwarn-mode.
+Modes (editing modes) in Emacs are used to alters how Emacs behaves in some useful ways.Modes are categorized as being either major or minor. Major mode provides means for working with particular file type (.org, .c .pdf etc) or buffers of none-file type (shell etc). Each buffer always uses a single major mode at any time. Minor modes are independent modes that associates some additional behavior  to file or buffer type. By independent we mean that they are not dependent on other modes neither major or minor ones and as such can be used independently of other modes. Minor modes can be turned on and off as we you wish you can have any number of minor modes in use for each buffer. Minor modes  can be either buffer-local or global.
+Global modes when in use are active in all your buffers where as buffer local modes are only active for the buffers you have specifically activated the mode for.Examples of minor modes are show-paren-mode, display-line-number-mode and cwarn-mode.
 
 * Creating   a minor mode
 Turning your code/package into a minor mode  could  be done using  the =define-minor-mode= mode macro. But to get a better understanding  of how minor modes work and are setup I decided to do it manually. To do so you need a bit of boilerplate code  following a few conventions (hence the macro).
@@ -14,15 +15,14 @@ We need
 
   That's really are all that is needed to create minor mode but in addition we can also   
    
-- Enable keymaps by adding entries in =minor-mode-map-alist=. Entries in the list are  pairs of minor-mode symbols and keymaps.
-- Enable hooks by creating  variable  with following convention =modename-mode-hook=.  This could initially be set to nil. running the hooks can be done using =run-hooks=
- - Enable lighter for minor-mode-alist again using minor mode variable symbol and
-
-Minor modes can be global or associtiated with specific buffer.  In case you want to to be associated with local buffer we need to make the minor-mode variable buffer local. This could be done using the =make-variable-buffer-local= command. I've comment out that part in the below code as i wanted this minor-mode to be global.  I left the comment so you can se how you could define the mode variable and make it buffer local in one shot.
-
+- Enable keymaps 
+- Enable hooks by   
+- Enable lighter for minor-mode
+  
 ** Defining the mode variable
 
- We start by defining the mode variable
+ We start by defining the mode variable. The name of the variable should end with =-mode=.In case you want minor-mode to be associated with local buffer we need to make the minor-mode variable buffer local. This could be done using the =make-variable-buffer-local= command. I've comment out that part in the below code as i wanted this minor-mode to be global.  I left the comment so you can see how you could define the mode variable and make it buffer-local in one shot.
+
 
 #+begin_src emacs-lisp
 ;; (make-variable-buffer-local
@@ -30,34 +30,35 @@ Minor modes can be global or associtiated with specific buffer.  In case you wan
 ;; )
 #+end_src
 
-=defvar= is Elisp special form. Special form means that the expression is evaluated in an out  of the ordninary way. That is it's not evaluated as "normal" expression but using different rules than those applied normally. consider ( + 2  3)  this is just combination consisting of symbols +, 2 and 3. Such expressions follow the rule to first evaluating subsexpressions (2 and 3) and apply the procedure (value of left most symbol) to the arguments which in this case are the evaluated to numbers 2 and 3. =defvar=  on the other hand user special rules for evaluating the expression. In above cas =jv-basic-edit-mode=  is a symbol for variable and is not  evaluated. Insted third thing in combination =nil= is evalueted and bound to the variable and last string is consider to be documentation string which is bound to symbols variable-documentaion string. =nil=  is just the empty list and is used to signify that variable has no value at the moment. =nil=  is also used to mean false sometimes. In this case we use it to signal that mode  currently isn't activated. ugh  this explanation is a bit convulated rewrite...
+=defvar= is Elisp special form. Special form means that the expression is evaluated in an out  of the ordinary way. That is it's not evaluated as "normal" expression but using different rules than those applied normally. consider ( + 2  3)  this is just combination consisting of symbols +, 2 and 3. Such expressions follow the rule to first evaluating subs expressions (2 and 3) and apply the procedure (value of left most symbol) to the arguments which in this case are the evaluated to numbers 2 and 3. =defvar=  on the other hand user special rules for evaluating the expression. In above case =jv-basic-edit-mode=  is a symbol for variable and is not  evaluated. Instead third thing in combination =nil= is evaluated and bound to the variable and last string is consider to be documentation string which is bound to symbols variable-documentation string. =nil=  is just the empty list and is used to signify that variable has no value at the moment. =nil=  is also used to mean false sometimes. In this case we use it to signal that mode  currently isn't activated. ugh  this explanation is a bit convulated rewrite...
 
-Anyway you can just think of defvar as a way to define a variable  with attached documenations string. 
+Anyway you can just think of defvar as a way to define a variable  with attached documentations string. 
 
 ** Defining  variable for mode specific keybindings
 
-Next we define the variable for to hold mode specific keybindings. 
+Next we define the variable for to hold mode specific keybindings. The naming convention here is to use the same prefix as the mode and add the suffix =-map= to the variable name.
+
 #+begin_src emacs-lisp
 (defvar jv-basic-edit-mode-map (make-sparse-keymap) "The keymap for jv-edit-basic-mode")
 #+end_src
 
-=Keymap= is special internal data structure in ELisp which can be used for binding commands to input events and are used for keylookup. Modes can use keymaps to associated mode specific keys to actions.   Keymaps can contain different kinds of elements one such element is  a char-table. A keymap containing a char-table is called a full keymap. char-tables is an space effective way of recording lots of keybindings. The element whos index is d would be the binding for d.  A =sparse-keymap=  does not contain  char-table and is usually what you need and would use.  There is a lot more to know about keybinding and keymaps if you want learn more see
+=Keymap= is special internal data structure in ELisp which can be used for binding commands to input events and are used for key lookup. Modes can use keymaps to associated mode specific keys to actions.   Keymaps can contain different kinds of elements one such element is  a char-table. A keymap containing a char-table is called a full keymap. char-tables is an space effective way of recording lots of keybindings. The element who's index is d would be the binding for d.  A =sparse-keymap=  does not contain  char-table and is usually what you need and would use.  There is a lot more to know about keybinding and keymaps if you want learn more see
 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Keymap-Basics.html][keymap basics]] and [[https://www.masteringemacs.org/article/mastering-key-bindings-emacs][masetring key bindings]]. 
 
 ** Defining a variable for hooks
 
-When I think of a hook I think of template method pattern. Emacs Hooks are variables holding list of functions to be called at some well defined point of execution. For instance a hook function could  be called after a mode has loaded some other just before. We often use hooks to as way to customize behavior of modes. Most modes have at least on hook that executes its list of function as last step mode initialization.
-The hook below will run on activation and deactivation of mode.
+When I think of a hook I think of template method pattern. Emacs Hooks are variables holding list of functions to be called at some well defined point of execution. For instance a hook function could  be called after a mode has loaded some other just before it loads. We often use hooks  as a way to customize behavior of modes. Most modes have at least one hook that executes its list of function as last step mode initialization.
+The hook below will run on activation and deactivation of mode. We name the variable by again using the mode name as prefix but this time we add the suffix =-hook=.
 
 #+begin_src emacs-lisp
 (defvar jv-basic-edit-mode-hook nil "The hook for jv-basic-edit-mode")
 #+end_src
 
- Currently I'm not using this hook but if me or someone would like to alter the behavior of this mode it readilly available.
+ Currently I'm not using this hook but if me or someone would like to alter the behavior of this mode it readily available.
 
 ** Adding keybindings
 
-Following code adds some keybinding. Normally it's considered good form to use some prefix keybinding as not to bluntly ovewrite other keybindings. In this case i feel using prefixes would anoy me to much. The  =jv-basic-edit-mode-map= variable was defined above. We simply use define-key to populate the variable and  associate the keybinding to this mode by adding an entry =minor-mode-map-alist=. The entry just cons pair of our mode symbol =jv-basic-edit-mode=  and the mode map list we just populated.
+Following code adds some keybinding. Normally it's considered good form to use some prefix keybinding as not to bluntly overwrite other keybindings. In this case i feel using prefixes would annoy me to much. The  =jv-basic-edit-mode-map= variable was defined above. We simply use define-key to populate the variable and  associate the keybinding to this mode by adding an entry =minor-mode-map-alist=. The entry just cons pair of our mode symbol =jv-basic-edit-mode=  and the mode map list we just populated.
 
 #+begin_src emacs-lisp
 (define-key jv-basic-edit-mode-map (kbd "C-<return>") 'open-newline)
@@ -98,7 +99,7 @@ Finally we define the function to initilize the mode it self. This is an interac
 
 * The commands
 
-I will present the commands code here for convienience so that I don't have to dig into or clone the repository if i want to look something up in future. This code has its flaws but the excersice focused on creating a minor mode so I might not correct the issues in code below.  Neither am I going to explain to much of the code in this section. 
+I will present the commands code here for convenience so that I don't have to dig into or clone the repository if i want to look something up in future. This code has its flaws but the excessive focused on creating a minor mode so I might not correct the issues in code below.  Neither am I going to explain to much of the code in this section. 
 
 #+begin_src emacs-lisp
 (defun open-newline (&optional n)
@@ -156,7 +157,7 @@ I will present the commands code here for convienience so that I don't have to d
   )
 #+end_src
 
-If mark is set we want kill the all lines within the whole region. We start by assigning beg and end to beging resp end of the line where point is at the moment. This set beg and end to beginning and end of the current line that point is looking at.  At this point we don't know wheter point is at last line or first line of the region. If point is greater then mark then mark  is located on first line of region but it might we don't know where on that line. To get the first position of first line we simply move point to mark using =(=goto-char(mark))=. Point is now on first line and we can get first position of that line as well as the whole region using =line-beginning-position=. The =save-excursion= will temporilly store the point end we reach end save-excursion block it will reset the point. If point is less than mark then mark is on last line of region. In similar fashion as above we instead need to find last-position of last line to cover all lines in the region. We need to add 1 to the =line-end-position=
+If mark is set we want kill the all lines within the whole region. We start by assigning beg and end to begging resp end of the line where point is at the moment. This set beg and end to beginning and end of the current line that point is looking at.  At this point we don't know wheter point is at last line or first line of the region. If point is greater then mark then mark  is located on first line of region but it might we don't know where on that line. To get the first position of first line we simply move point to mark using =(=goto-char(mark))=. Point is now on first line and we can get first position of that line as well as the whole region using =line-beginning-position=. The =save-excursion= will temporally store the point end we reach end save-excursion block it will reset the point. If point is less than mark then mark is on last line of region. In similar fashion as above we instead need to find last-position of last line to cover all lines in the region. We need to add 1 to the =line-end-position=
  to include return/newline  at the end of line as =line-end-position=
 considers it not being part of the line actual line.
 
@@ -175,7 +176,7 @@ considers it not being part of the line actual line.
       (save-mark-and-excursion(yank)))))
 #+end_src
 
-=unwind-protect=  is similar to finally clause. If next-line tries to go beyond end of buffer we still want to yank back the killed line to preserve consistent state else that line will disipear (even thou will still be in kill-ring).
+=unwind-protect=  is similar to finally clause. If next-line tries to go beyond end of buffer we still want to yank back the killed line to preserve consistent state else that line will disappear (even thou will still be in kill-ring).
  
 #+begin_src emacs-lisp
 (defun swapline-up ()
@@ -224,7 +225,7 @@ is used to subdivide content of package. I think they use the term stylized comm
   ;;; jv-basic-edit.el ends here
 #+end_src  
 
-  Note your actuall package code should go in between  =;;;Code=  and 
+  Note your actual package code should go in between  =;;;Code=  and 
  =jv-basic-edit.el ends here= where jv-basic-edit.el should be name of your package file.
  
 #+begin_src emacs-lisp
@@ -240,7 +241,7 @@ In the future I might be using the [[https://github.com/raxod502/straight.el][st
 
 This will prompt you for a file to install. The file has to be package see above to learn how to turn your code into package.
 
-** Initilizing package in your init file
+** Initializing package in your init file
 
 I currently use [[https://github.com/jwiegley/use-package][usepackage]] for my init files as it simplifies life. So following lines will load the package and start the mode  when i run my emacs.
 
@@ -250,4 +251,4 @@ I currently use [[https://github.com/jwiegley/use-package][usepackage]] for my i
     :config (jv-basic-edit-mode 1))
 #+end_src
 
-I use =:ensure nil= here to make sure it doesn't try download it from any repositories as I currently only install it manuall y on my local system.
+I use =:ensure nil= here to make sure it doesn't try download it from any repositories as I currently only install it manually on my local system.
