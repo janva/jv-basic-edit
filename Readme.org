@@ -194,10 +194,8 @@ considers it not being part of the line actual line.
 
 * Turning your code into package
 
-Following code can be found at the top the file containing the minor mode. It turn the file into a simple package. You can read more about
-[[https://www.gnu.org/software/emacs/manual/html_node/elisp/Packaging-Basics.html][creating simple packages]] in the Emacs manual.  =;;;=
-is used to subdivide content of package. I think they use the term stylized comments for this. You can read about the the different headers etc [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Library-Headers.html][here.]]
-
+A simple package consist of single ELisp file conforming to ELisp library header conventions.
+You read about [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Packaging-Basics.html][creating simple package here.]]  This is what I've got in my file. 
 
 #+begin_src emacs-lisp
 
@@ -209,11 +207,12 @@ is used to subdivide content of package. I think they use the term stylized comm
     ;; Version: 0.1
 
     ;; Keywords: elisp, textediting
-    ;; URL:
+    ;; URL: https://url_goes_here.com
 
     ;;; Commentary
 
-    ;; This package provides the minor mode jv-basic-edit. It's a minimal package ;; consisting of a feew basic text editing commands such as copy whole line.  ;; This file is not part of GNU Emacs. This was part of me learning Elisp and how minor mode are built. Feel free to copy but be aware the code herein has its flaws and there are probably better solutions out there.
+  ;; This package provides the minor mode jv-basic-edit. It's a minimal package ;; consisting of a feew basic text editing commands such as copy whole line.  
+;; This file is not part of GNU Emacs. This was part of me learning Elisp and how minor mode are built. Feel free to copy but be aware the code herein has its flaws and there are probably better solutions out there.
 
     ;; This file is free sofware...
 
@@ -225,25 +224,25 @@ is used to subdivide content of package. I think they use the term stylized comm
   ;;; jv-basic-edit.el ends here
 #+end_src  
 
-  Note your actual package code should go in between  =;;;Code=  and 
- =jv-basic-edit.el ends here= where jv-basic-edit.el should be name of your package file.
+  The  package code should goes in between  =;;;Code=  and 
+ =;;;jv-basic-edit.el ends here=. 
  
 #+begin_src emacs-lisp
 (provide 'jv-basic-edit)
 #+end_src
 
 ** Manually installing your package
-In the future I might be using the [[https://github.com/raxod502/straight.el][straight package]]. This will enable to fetch and install the package from my github using usepackage package. In the meanwhile package installation will be done manually on my local system.  This can be done as follows.
+In the future I might be using the [[https://github.com/raxod502/straight.el][straight package]]. This will enable to fetch and install the package from my github using usepackage package. In the meanwhile I package have installed the package  manually on my local system. This can be done using the =package-install-file= .
 
 #+begin_src emacs-lisp
   M-x package-install-file
 #+end_src
 
-This will prompt you for a file to install. The file has to be package see above to learn how to turn your code into package.
+Above  will prompt you for a file to install. The file has to be package see above to learn how to turn your code into package.
 
 ** Initializing package in your init file
 
-I currently use [[https://github.com/jwiegley/use-package][usepackage]] for my init files as it simplifies life. So following lines will load the package and start the mode  when i run my emacs.
+I currently use [[https://github.com/jwiegley/use-package][usepackage]] for my init files as it simplifies life.  Following lines will load the package and start the mode  when i run my emacs.
 
 #+begin_src emacs-lisp
   (use-package jv-basic-edit
@@ -252,3 +251,4 @@ I currently use [[https://github.com/jwiegley/use-package][usepackage]] for my i
 #+end_src
 
 I use =:ensure nil= here to make sure it doesn't try download it from any repositories as I currently only install it manually on my local system.
+

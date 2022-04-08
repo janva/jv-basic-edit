@@ -54,6 +54,7 @@
 ;;register keybingings map (associate with this mode) 
 (add-to-list 'minor-mode-map-alist ( cons 'jv-basic-edit-mode jv-basic-edit-mode-map))
 
+
 (defun jv-basic-edit-mode (&optional ARG)
   "jv-basic-edit-mode is a minor mode consisting of a few basic editing commands. If ARG positive number > 0  activate mode else deactivate.If ARG is 'toggle then toggle mode"
   (interactive (list 'toggle))
