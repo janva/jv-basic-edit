@@ -71,7 +71,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun open-newline (&optional n)
-  "Opens a new line below current line even if cursor is in middle of current line.Move point to opened line. If N is set open n lines."
+  "Opens a new line below current line even if cursor is in middle of current
+line.Move point to opened line. If N is set open n lines."
   (interactive "pNumber of lines to open: ")
   (goto-char (line-end-position))
 	     (newline (or n 1)))
@@ -89,21 +90,24 @@
 
 
 (defun duplicate--line (&optional direction)
-  "Duplicates line(s) of text in DIRECTION. if DIRECTION is 1  duplicate to line bellow else duplicate to line abbove current line." 
+  "Duplicates line(s) of text in DIRECTION. if DIRECTION is 1  duplicate to line
+ below else duplicate to line abbove current line." 
   (save-mark-and-excursion
     (copy-line)
     (open-newline)
     (yank))
   (when (eq direction 1)
-    (next-line)))
+    (forward-line 1)))
 ;;Fixme only works once for selected region since loosing the marked area when doing next line
 (defun duplicate-line-down  ()
-  "Creates newline(s) containing content of current line(s) below the current line. "
+  "Creates newline(s) containing content of current line(s) below the current
+ line. "
   (interactive)
   (duplicate--line 1))
 
 (defun duplicate-line-up  ()
-  "Creates  newline(s) containing content of current line(s) above the current line. "
+  "Creates  newline(s) containing content of current line(s) above the current
+line. "
   (interactive)
     (duplicate--line))
 
@@ -133,7 +137,8 @@
 ;;   (save-excursion (yank))))
 ;;FIXME should barf on read only buffers
 (defun jv/kill--lines ()
-  "Kill whole line(s). If mark is set kill all (whole)lines within region else kill line wher point is. "
+  "Kill whole line(s). If mark is set kill all (whole)lines within region else
+ kill line where point is. "
   (let ((beg (line-beginning-position))
 	;; could cas problems on last line of buffer
 	(end (+ 1 (line-end-position))))
@@ -170,8 +175,8 @@
   (interactive)
   (jv/kill--lines)
   (unwind-protect
-
-      (previous-line)
+      ;;(previous-line)
+      (forward-line -1)
     (progn
       (beginning-of-line)
       (save-mark-and-excursion(yank))
